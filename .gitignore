@@ -1,0 +1,10 @@
+build
+build-*
+CMakeLists.txt.user
+zos*
+Autoref
+__temp__*
+bin/*
+!lua_script*
+lua_zeus.cpp
+*zh_CN.ts

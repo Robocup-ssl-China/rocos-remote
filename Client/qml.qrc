@@ -1,0 +1,41 @@
+<RCC>
+    <qresource prefix="/">
+        <file>src/qml/main.qml</file>
+        <file>qtquickcontrols2.conf</file>
+        <file>src/qml/Components/qmldir</file>
+        <file>src/qml/Theme/qmldir</file>
+        <file>src/qml/Theme/Theme.qml</file>
+        <file>resource/icon/icon.png</file>
+        <file>src/qml/Components/CGroupBox.qml</file>
+        <file>src/qml/Components/CColumn.qml</file>
+        <file>src/qml/Components/CGridScroll.qml</file>
+        <file>src/qml/Components/CSwitch.qml</file>
+        <file>resource/icon/brain.png</file>
+        <file>resource/icon/field.png</file>
+        <file>resource/icon/left-arrow.png</file>
+        <file>resource/icon/right-arrow.png</file>
+        <file>resource/icon/shirt.png</file>
+        <file>resource/icon/connect.png</file>
+        <file>resource/icon/disconnect.png</file>
+        <file>src/qml/Components/CButton.qml</file>
+        <file>src/qml/ControlBoard.qml</file>
+        <file>src/qml/Components/CComboBox.qml</file>
+        <file>src/qml/Components/CText.qml</file>
+        <file>resource/icon/joy.png</file>
+        <file>resource/icon/referee.png</file>
+        <file>resource/icon/settings.png</file>
+        <file>src/qml/RefereeBox.qml</file>
+        <file>src/qml/CrazyBoard.qml</file>
+        <file>src/qml/Components/CSpinBox.qml</file>
+        <file>src/qml/Components/CLight.qml</file>
+        <file>src/qml/Settings.qml</file>
+        <file>resource/icon/start.png</file>
+        <file>resource/icon/stop.png</file>
+        <file>src/qml/CustomDW/DockWidget.qml</file>
+        <file>src/qml/CustomDW/FloatingWindow.qml</file>
+        <file>src/qml/CustomDW/Frame.qml</file>
+        <file>src/qml/CustomDW/TitleBar.qml</file>
+        <file>resource/icon/window_close.png</file>
+        <file>resource/icon/window_maximize.png</file>
+    </qresource>
+</RCC>
