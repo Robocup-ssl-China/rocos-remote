@@ -78,5 +78,5 @@ message Debug_Heatmap{
 		int32 value = 1;
 		repeated Point p = 2;
 	}
-	repeated Heat map = 1;
+	repeated Heat points = 1;
 }

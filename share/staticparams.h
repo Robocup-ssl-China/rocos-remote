@@ -136,7 +136,7 @@ namespace ZSS {
         const int CONTROL_BACK_RECEIVE[PARAM::TEAMS] = {60001, 60002};
         const int VISION_SEND[PARAM::TEAMS] = {23333, 23334};
         const int SEND_TO_PYTHON = 41001;
-        const int DEBUG_MSG_RECEIVE[2] = {20001, 20002};
+        const int DEBUG_MSG_RECEIVE[2] = {22001, 22002};
         const int DEBUG_SCORE_RECEIVE[2] = {20003, 20004};
         const int SIM_SEND = 20011;
         const double FRAME_RATE = 75;
