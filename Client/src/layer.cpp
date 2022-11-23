@@ -82,6 +82,10 @@ bool LayerNode::draw(){
         _timer.restart();
         std::shared_lock s_lock(_mutex_tree);
         if(_mutex.try_lock()){
+            if(_image == nullptr){
+                _mutex.unlock();
+                return false;
+            }
             _image->fill(Qt::transparent);
             Layer* p_child = _child;
             while(p_child!=nullptr){

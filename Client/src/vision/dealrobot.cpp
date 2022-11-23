@@ -1,5 +1,7 @@
 #include "dealrobot.h"
 #include "visionmodule.h"
+#include "cmath"
+#include "eigen3/Eigen/Dense"
 
 CDealRobot::CDealRobot()
 {
@@ -20,12 +22,22 @@ void CDealRobot::mergeRobot() {
             double angle = 0.;
             for (int camID = 0; camID < PARAM::CAMERA; camID++) {
                 if (robotSequence[color][robotID][camID].valid) {
-                    isFound = true;
                     double weight = VisionModule::instance()->calculateWeight(camID, robotSequence[color][robotID][camID].pos);
                     pos.setX((weight_total * pos.x() + weight * robotSequence[color][robotID][camID].pos.x())/(weight_total + weight));
                     pos.setY((weight_total * pos.y() + weight * robotSequence[color][robotID][camID].pos.y())/(weight_total + weight));
-                    angle = (angle * weight_total + robotSequence[color][robotID][camID].angle * weight) / (weight_total + weight);
+                    //angle = (angle * weight_total + robotSequence[color][robotID][camID].angle * weight) / (weight_total + weight);
+                    if(!isFound){
+                        angle = robotSequence[color][robotID][camID].angle;
+                    }
+                    else{
+                        Eigen::Vector2d observation(std::cos(robotSequence[color][robotID][camID].angle), std::sin(robotSequence[color][robotID][camID].angle));
+                        Eigen::Vector2d prediction(std::cos(angle), std::sin(angle));
+                        prediction = prediction * weight_total + weight * observation;
+                        prediction.normalize();
+                        angle = std::atan2(prediction[1], prediction[0]);
+                    }
                     weight_total += weight;
+                    isFound = true;
                 }
             }
             if (isFound) {

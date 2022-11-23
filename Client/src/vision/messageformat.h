@@ -7,11 +7,13 @@
 struct Ball {
     CGeoPoint pos;
     CVector vel;
+    double height;
     bool valid = false;
     Ball() : pos() {}
-    void fill(double x, double y) {
+    void fill(double x, double y, double z=0) {
         this->pos.setX(x);
         this->pos.setY(y);
+        height = z;
     }
     void fill(double x, double y, CVector vel) {
         this->pos.setX(x);
@@ -87,11 +89,11 @@ public:
         robotNum[PARAM::BLUE] = robotNum[PARAM::YELLOW] = 0;
         ball[0].fill(-32767, -32767);
     }
-    bool addBall(double x, double y) {
+    bool addBall(double x, double y,double z=0) {
         if (ballNum >= PARAM::BALLNUM) {
             return false;
         }
-        ball[ballNum++].fill(x, y);
+        ball[ballNum++].fill(x, y, z);
         return true;
     }
     bool addBall(const Ball& b) {

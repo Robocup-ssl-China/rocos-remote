@@ -30,7 +30,7 @@ void CDealBall::init() {
             for (int j = 0; j < PARAM::BALLNUM; j++) {
                 if (j < VisionModule::instance()->_camera[i][0].ballNum){
                     Ball current = VisionModule::instance()->_camera[i][0].ball[j];
-                    ballSequence[j][i].fill(current.pos.x(), current.pos.y());
+                    ballSequence[j][i].fill(current.pos.x(), current.pos.y(), current.height);
                 }
                 else {
                     ballSequence[j][i].fill(-32767, 32767);
@@ -59,17 +59,19 @@ void CDealBall::mergeBall() {
                 }
                 int index = -1;
                 CGeoPoint BallPos = ballSequence[i][j].pos;
+                auto _t_b = ballSequence[i][j];
                 double weight_total = VisionModule::instance()->calculateWeight(j, BallPos);
                 for (int k = j; k < PARAM::CAMERA; k++) {
                     if (findPair(index, k, BallPos)) {
                         double weight = VisionModule::instance()->calculateWeight(k, ballSequence[index][k].pos);
                         BallPos.setX((BallPos.x() * weight_total + ballSequence[index][k].pos.x() * weight)/(weight_total + weight));
                         BallPos.setY((BallPos.y() * weight_total + ballSequence[index][k].pos.y() * weight)/(weight_total + weight));
+                        _t_b.height = ((_t_b.height * weight_total + ballSequence[index][k].height * weight)/(weight_total + weight));
                         weight_total += weight;
                         ballSequence[index][k].fill(-32767, 32767);
                     }
                 }
-                finalSequence[actualBallNum++].fill(BallPos.x(), BallPos.y());
+                finalSequence[actualBallNum++].fill(BallPos.x(), BallPos.y(),_t_b.height);
                 if (actualBallNum >= PARAM::BALLNUM) break;
             }
         }

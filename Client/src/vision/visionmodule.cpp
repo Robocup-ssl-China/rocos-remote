@@ -162,6 +162,7 @@ void VisionModule::sendData() {
     if (result.ballNum > 0) {
         detectionBall->set_x(result.ball[0].pos.x());
         detectionBall->set_y(result.ball[0].pos.y());
+        detectionBall->set_height(result.ball[0].height);
         detectionBall->set_vel_x(result.ball[0].vel.x());
         detectionBall->set_vel_y(result.ball[0].vel.y());
         detectionBall->set_valid(result.ball[0].valid);
@@ -199,8 +200,8 @@ void VisionModule::sendData() {
     data.resize(size);
     _detectionFrame.SerializeToArray(data.data(),size);
     p_draw_signal.publish(data.data(),size);
-    udpSender.sendData(data.data(),size,ZSS::Athena::VISION_SEND[PARAM::BLUE]);
-    udpSender.sendData(data.data(),size,ZSS::Athena::VISION_SEND[PARAM::YELLOW]);
+//    udpSender.sendData(data.data(),size,ZSS::Athena::VISION_SEND[PARAM::BLUE]);
+//    udpSender.sendData(data.data(),size,ZSS::Athena::VISION_SEND[PARAM::YELLOW]);
 }
 
 void VisionModule::updateEdge() {
@@ -332,7 +333,7 @@ void VisionModule::parse(void *ptr, int size) {
         for (int i = 0; i < ballSize; i++) {
             const SSL_DetectionBall& ball = detection.balls(i);
             if (true) {
-                message.addBall(ball.x(), ball.y());
+                message.addBall(ball.x(), ball.y(),ball.z());
             }
         }
         // add blue robot

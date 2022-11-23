@@ -9,6 +9,7 @@ FieldLineLayer::FieldLineLayer(FieldTransform* _tf):Layer("FieldLine",_tf){
 }
 bool FieldLineLayer::draw(){
     std::scoped_lock<std::shared_mutex> lock(_mutex);
+    if(_image == nullptr) return false;
     _image->fill(Qt::transparent);
     _painter.setPen(QPen(Color::_()->FIELDLINE,_->s(20)));
     drawPath();
@@ -44,10 +45,18 @@ void VisionLayer::receiveData(const zos::Data &data) {
 }
 void VisionLayer::drawFusionVision(const Vision_DetectionFrame& frame){
     std::scoped_lock<std::shared_mutex> lock(_mutex);
-    static int visionCount = 0;
+    if(_image == nullptr) return;
     _image->fill(Qt::transparent);
+
+    static int visionCount = 0;
     if (frame.has_balls()) {
-        paintBall(Color::_()->BALL, frame.balls().x(), frame.balls().y(),FP::_()->s_ballDiameter/2);
+        double ratio = 1;
+        if(frame.balls().has_height() && frame.balls().height()>0){
+            double cam_height = 1100;// TODO
+            double r = 90;
+            ratio = 1+1.0/(std::max(1.0+1.0/r,cam_height/frame.balls().height())-1);
+        }
+        paintBall(Color::_()->BALL, frame.balls().x(), frame.balls().y(),ratio*(FP::_()->s_ballDiameter/2));
         paintFocus(Color::_()->BALL_FOCUS,frame.balls().x(), frame.balls().y(),500,visionCount++);
     }
     int blue_size = frame.robots_blue_size();
@@ -136,6 +145,7 @@ bool DebugLayer::draw(){
 }
 void DebugLayer::paintDebug(const ZSS::Protocol::Debug_Msgs&){
     std::scoped_lock<std::shared_mutex> lock(_mutex);
+    if(_image == nullptr) return;
     _image->fill(Qt::transparent);
     QFont font;
     int fontSize = _->s(130);
@@ -144,9 +154,23 @@ void DebugLayer::paintDebug(const ZSS::Protocol::Debug_Msgs&){
     _painter.setBrush(QBrush(Color::_()->DEBUG_BRUSH_COLOR));
     for(int i = 0; i < _msg.msgs_size(); i++) {
         auto& msg = _msg.msgs(i);
-        _painter.setPen(QPen(Color::_()->DEBUG_MSG[msg.color()], _->s(10)));
-        double x1, x2, y1, y2;
+        if(msg.color() == ZSS::Protocol::Debug_Msg::Color::Debug_Msg_Color_USE_RGB) {
+            int value = msg.rgb_value();
+            int rgb[3];
+            for(int i = 0; i < 3; i++) {
+                rgb[2 - i] = value % 1000;
+                value = (value - rgb[2 - i]) / 1000;
+                if(rgb[2 - i]>255||rgb[2 - i]<0){//error value
+                    rgb[0]=0;rgb[1]=0;rgb[2]=0;break;
+                }
+            }
+            _painter.setPen(QPen(QColor(rgb[0], rgb[1], rgb[2]), _->s(15)));
+        }else{
+            _painter.setPen(QPen(Color::_()->DEBUG_MSG[msg.color()], _->s(15)));
+        }
+        double x1, x2, y1, y2, x3, y3, x4, y4;
         double minx,miny,maxx,maxy;
+        QPainterPath newpath;
         switch(msg.type()) {
         case ZSS::Protocol::Debug_Msg_Debug_Type_ARC:
             x1 = msg.arc().rect().point1().x();
@@ -173,9 +197,25 @@ void DebugLayer::paintDebug(const ZSS::Protocol::Debug_Msgs&){
             break;
         }
         case ZSS::Protocol::Debug_Msg_Debug_Type_TEXT:
+            font.setPointSizeF(_->s(msg.text().size()));
+            font.setWeight(msg.text().weight());
+            _painter.setFont(font);
             _painter.drawText(_->_.map(QPointF((msg.text().pos().x()), (msg.text().pos().y()))), QString::fromStdString(msg.text().text()));
             break;
         case ZSS::Protocol::Debug_Msg_Debug_Type_ROBOT:
+            break;
+        case ZSS::Protocol::Debug_Msg_Debug_Type_BEZIER:
+            x1 = msg.bezier().start().x();
+            y1 = msg.bezier().start().y();
+            x2 = msg.bezier().c1().x();
+            y2 = msg.bezier().c1().y();
+            x3 = msg.bezier().end().x();
+            y3 = msg.bezier().end().y();
+            x4 = msg.bezier().c2().x();
+            y4 = msg.bezier().c2().y();
+            newpath.moveTo(_->_.map(QPointF((x1), (y1))));
+            newpath.cubicTo(_->_.map(QPointF((x2),(y2))), _->_.map(QPointF((x4), (y4))), _->_.map(QPointF((x3),(y3))));
+            _painter.drawPath(newpath);
             break;
         default:
             qDebug() << "debug message type not support!";
